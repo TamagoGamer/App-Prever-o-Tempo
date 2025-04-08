@@ -1,136 +1,117 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator, TextInput, Button, FlatList, useColorScheme } from 'react-native';
+import { useEffect, useState } from 'react';
+import { StyleSheet, ScrollView, View as RNView, LayoutAnimation, Alert } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
+import axios from 'axios';
 
 export default function TabTwoScreen() {
-  const [city, setCity] = useState('Lisbon');
-  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
-  const [forecast, setForecast] = useState<{ date: string; tempMax: number; tempMin: number }[]>([]);
-  const [loading, setLoading] = useState(false);
-  const colorScheme = useColorScheme();
-
-  const fetchCoordinates = async (cityName: string) => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1`);
-      if (response.data.results) {
-        const { latitude, longitude } = response.data.results[0];
-        setCoords({ lat: latitude, lon: longitude });
-      } else {
-        console.warn('Cidade não encontrada');
-      }
-    } catch (error) {
-      console.error('Erro ao buscar coordenadas:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchForecast = async () => {
-    if (!coords) return;
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`
-      );
-
-      const forecastData = response.data.daily.time.map((date: string, index: number) => ({
-        date,
-        tempMax: response.data.daily.temperature_2m_max[index],
-        tempMin: response.data.daily.temperature_2m_min[index],
-      }));
-
-      setForecast(forecastData.slice(0, 5));
-    } catch (error) {
-      console.error('Erro ao buscar previsão do tempo:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [selectedCity, setSelectedCity] = useState<string>('');
+  const [forecast, setForecast] = useState<any[]>([]);
 
   useEffect(() => {
-    const loadCityFromStorage = async () => {
-      const storedCity = await AsyncStorage.getItem('defaultCity');
-      if (storedCity) {
-        setCity(storedCity);
+    const loadFavorites = async () => {
+      const data = await AsyncStorage.getItem('favorites');
+      if (data) {
+        const favs = JSON.parse(data);
+        setFavorites(favs);
+        setSelectedCity(favs[0]);
       }
     };
-    loadCityFromStorage();
+    loadFavorites();
   }, []);
 
   useEffect(() => {
-    fetchForecast();
-  }, [coords]);
+    if (selectedCity) fetchForecast(selectedCity);
+  }, [selectedCity]);
+
+  const fetchForecast = async (city: string) => {
+    try {
+      const geo = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`);
+      const { latitude, longitude } = geo.data.results[0];
+
+      const weather = await axios.get(
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`
+      );
+
+      const days = weather.data.daily.time.map((date: string, index: number) => {
+        const maxTemp = weather.data.daily.temperature_2m_max[index];
+        const minTemp = weather.data.daily.temperature_2m_min[index];
+        const code = weather.data.daily.weathercode[index];
+
+        const icon = code === 0 ? '☀️' : code < 50 ? '⛅' : '🌧️';
+        const warning =
+          code >= 80 ? '⚠️ Tempestade perigosa prevista!' :
+          code >= 70 ? '⚠️ Chuvas muito fortes previstas!' :
+          code >= 60 ? '⚠️ Possível tempestade!' : '';
+
+        return { date, maxTemp, minTemp, icon, warning };
+      });
+
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setForecast(days);
+    } catch (error) {
+      console.error('Erro ao buscar previsão:', error);
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Previsão do Tempo</Text>
-      <TextInput
-        style={[styles.input, colorScheme === 'dark' && styles.inputDark]}
-        placeholder="Digite a cidade"
-        placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#555'}
-        value={city}
-        onChangeText={setCity}
-      />
-      <Button title="Buscar Previsão" onPress={() => fetchCoordinates(city)} />
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Previsão de 7 Dias</Text>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <FlatList
-          data={forecast}
-          keyExtractor={(item) => item.date}
-          renderItem={({ item }) => (
-            <View style={styles.forecastItem}>
-              <Text style={styles.date}>{item.date}</Text>
-              <Text style={styles.temp}>🌡 Máx: {item.tempMax}°C | Mín: {item.tempMin}°C</Text>
-            </View>
-          )}
-        />
-      )}
-    </View>
+      <Picker
+        selectedValue={selectedCity}
+        style={styles.picker}
+        onValueChange={(itemValue) => setSelectedCity(itemValue)}>
+        {favorites.map((city, index) => (
+          <Picker.Item key={index} label={city} value={city} />
+        ))}
+      </Picker>
+
+      {forecast.map((day, index) => (
+        <View key={index} style={styles.card}>
+          <Text style={styles.date}>{day.date}</Text>
+          <Text style={styles.weather}>{day.icon} {day.minTemp}°C - {day.maxTemp}°C</Text>
+          {day.warning ? <Text style={styles.warning}>{day.warning}</Text> : null}
+        </View>
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    padding: 16,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 16,
   },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginVertical: 10,
-    width: '80%',
-    backgroundColor: '#fff',
-    color: '#000',
+  picker: {
+    height: 50,
+    width: '90%',
+    marginBottom: 20,
   },
-  inputDark: {
-    backgroundColor: '#333',
-    color: '#fff',
-  },
-  forecastItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    alignItems: 'center',
+  card: {
+    backgroundColor: '#eee',
+    padding: 12,
+    borderRadius: 12,
+    marginVertical: 8,
+    width: '100%',
   },
   date: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  temp: {
+  weather: {
     fontSize: 16,
+    marginVertical: 4,
+  },
+  warning: {
+    color: 'red',
+    fontWeight: 'bold',
   },
 });
