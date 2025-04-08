@@ -20,65 +20,46 @@ Este é um projeto de aplicativo móvel desenvolvido com **React Native** que fo
 
 ## Instalação
 
-1. Clone este repositório para o seu computador:
+1. Clone ou baixe o repositório:
    ```bash
-   git clone https://github.com/seuusuario/seuprojeto-clima.git
-Navegue até a pasta do projeto:
+   git clone <URL-do-repositório>
 
-bash
-Copiar
-Editar
-cd seuprojeto-clima
-Instale as dependências:
+2. Navegue até a pasta do projeto:
+    ```bash
+    cd nome-do-projeto
 
-bash
-Copiar
-Editar
-npm install
-Execute o aplicativo no emulador ou dispositivo:
+## Como Funciona
 
-Para Android:
+### Buscar Clima:
+O usuário pode digitar o nome de uma cidade na caixa de texto e clicar em "Buscar Clima" para ver a temperatura atual da cidade. O aplicativo faz uma requisição para o serviço de geocodificação (Open Meteo) para obter as coordenadas da cidade e, em seguida, faz uma requisição para obter os dados climáticos.
 
-bash
-Copiar
-Editar
-npx react-native run-android
-Para iOS:
+### Armazenamento de Cidade Favorita:
+A cidade inserida pode ser salva como favorita utilizando o AsyncStorage. Quando o aplicativo for reaberto, ele irá recuperar a cidade favorita e exibir o clima correspondente.
 
-bash
-Copiar
-Editar
-npx react-native run-ios
-Como Funciona
-Buscar Clima: O usuário pode digitar o nome de uma cidade na caixa de texto e clicar em "Buscar Clima" para ver a temperatura atual da cidade. O aplicativo faz uma requisição para o serviço de geocodificação (Open Meteo) para obter as coordenadas da cidade e, em seguida, faz uma requisição para obter os dados climáticos.
+### Modo Claro e Escuro:
+O aplicativo ajusta automaticamente o tema da interface com base nas configurações do sistema do dispositivo (modo claro ou escuro).
 
-Armazenamento de Cidade Favorita: A cidade inserida pode ser salva como favorita utilizando o AsyncStorage. Quando o aplicativo for reaberto, ele irá recuperar a cidade favorita e exibir o clima correspondente.
+## Estrutura do Projeto
 
-Modo Claro e Escuro: O aplicativo ajusta automaticamente o tema da interface com base nas configurações do sistema do dispositivo (modo claro ou escuro).
+- **src/components**: Contém componentes reutilizáveis como ThemedText e ThemedView.
+- **src/screens**: Contém as telas do aplicativo, incluindo TabOneScreen (Clima Atual) e TabTwoScreen (Previsão).
+- **src/context**: Contém o contexto WeatherContext para gerenciar as cidades favoritas.
+- **src/api**: Contém funções para interagir com as APIs externas (geocodificação e clima).
 
-Estrutura do Projeto
-src/components: Contém componentes reutilizáveis como ThemedText e ThemedView.
+## Melhorias Futuras
 
-src/screens: Contém as telas do aplicativo, incluindo TabOneScreen (Clima Atual) e TabTwoScreen (Previsão).
+- Adicionar animações usando react-native-reanimated para melhorar a experiência do usuário.
+- Exibir ícones de clima (☀️ 🌧️ ⛅) de acordo com as condições climáticas.
+- Exibir a previsão do tempo detalhada por hora ou por dia.
+- Implementar testes unitários para garantir a estabilidade do aplicativo.
 
-src/context: Contém o contexto WeatherContext para gerenciar as cidades favoritas.
+## Licença
 
-src/api: Contém funções para interagir com as APIs externas (geocodificação e clima).
-
-Melhorias Futuras
-Adicionar animações usando react-native-reanimated para melhorar a experiência do usuário.
-
-Exibir ícones de clima (☀️ 🌧️ ⛅) de acordo com as condições climáticas.
-
-Exibir a previsão do tempo detalhada por hora ou por dia.
-
-Implementar testes unitários para garantir a estabilidade do aplicativo.
-
-Licença
 Este projeto está licenciado sob a MIT License.
 
-Contribuições
+## Contribuições
+
 Sinta-se à vontade para fazer contribuições! Envie um pull request ou abra uma issue para sugerir melhorias.
 
-Autor: [Seu Nome]
-GitHub: seu-usuario
+**Autor**: [Seu Nome]  
+**GitHub**: seu-usuario
