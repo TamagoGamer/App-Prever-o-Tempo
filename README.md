@@ -43,15 +43,16 @@ O aplicativo ajusta automaticamente o tema da interface com base nas configuraç
 
 - **src/components**: Contém componentes reutilizáveis como ThemedText e ThemedView.
 - **src/screens**: Contém as telas do aplicativo, incluindo TabOneScreen (Clima Atual) e TabTwoScreen (Previsão).
-- **src/context**: Contém o contexto WeatherContext para gerenciar as cidades favoritas.
 - **src/api**: Contém funções para interagir com as APIs externas (geocodificação e clima).
 
 ## Melhorias Futuras
 
 - Adicionar animações usando react-native-reanimated para melhorar a experiência do usuário.
-- Exibir ícones de clima (☀️ 🌧️ ⛅) de acordo com as condições climáticas.
-- Exibir a previsão do tempo detalhada por hora ou por dia.
-- Implementar testes unitários para garantir a estabilidade do aplicativo.
+- Utilizar context para gerenciar o estado da aplicação e tornar o código mais fácil de manter.
+- Melhoria na interface do usuário, adicionando mais detalhes e informações sobre o clima.
+- Melhoria na User Experience, adicionando feedbacks visuais e melhorar a passagem de dados de uma tela para outra.
+- Adicionar um base de dados invés de Async Storage para armazenar as cidades favoritas.
+- Implementar mais testes unitários para garantir a estabilidade do aplicativo.
 
 ## Licença
 
@@ -61,5 +62,5 @@ Este projeto está licenciado sob a MIT License.
 
 Sinta-se à vontade para fazer contribuições! Envie um pull request ou abra uma issue para sugerir melhorias.
 
-**Autor**: [Seu Nome]  
-**GitHub**: seu-usuario
+**Autor**: [Thales_Pires]  
+**GitHub**: TamagoGamer
