@@ -28,6 +28,18 @@ Este é um projeto de aplicativo móvel desenvolvido com **React Native** que fo
     ```bash
     cd nome-do-projeto
 
+3. Instale as dependências necessárias:
+    ```bash
+    npm install
+
+4. Inicie o aplicativo em um emulador ou dispositivo físico:
+    ```bash
+    npm start
+
+5. Aperte a tecla W para abrir no navegador ou a tecla A para abrir no emulador.
+    ```bash
+    W or A
+
 ## Como Funciona
 
 ### Buscar Clima:
@@ -53,10 +65,6 @@ O aplicativo ajusta automaticamente o tema da interface com base nas configuraç
 - Melhoria na User Experience, adicionando feedbacks visuais e melhorar a passagem de dados de uma tela para outra.
 - Adicionar um base de dados invés de Async Storage para armazenar as cidades favoritas.
 - Implementar mais testes unitários para garantir a estabilidade do aplicativo.
-
-## Licença
-
-Este projeto está licenciado sob a MIT License.
 
 ## Contribuições
 
