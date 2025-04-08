@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator, TextInput, Button, View as RNView, LayoutAnimation, TouchableOpacity } from 'react-native';
+import { StyleSheet, ActivityIndicator, TextInput, Button, View as RNView, LayoutAnimation, TouchableOpacity, Appearance } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,6 +10,7 @@ export default function TabOneScreen() {
   const [weather, setWeather] = useState<{ temp: number; icon: string; hour: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const colorScheme = Appearance.getColorScheme();
 
   const fetchCoordinates = async (cityName: string) => {
     try {
@@ -85,18 +86,28 @@ export default function TabOneScreen() {
     fetchWeather();
   }, [coords]);
 
+  const containerStyle = colorScheme === 'dark' ? styles.containerDark : styles.containerLight;
+  const inputStyle = colorScheme === 'dark' ? styles.inputDark : styles.inputLight;
+  const buttonGroupStyle = colorScheme === 'dark' ? styles.buttonGroupDark : styles.buttonGroupLight;
+  const textStyle = colorScheme === 'dark' ? styles.textDark : styles.textLight;
+  const tempStyle = colorScheme === 'dark' ? styles.tempDark : styles.tempLight;
+  const subtitleStyle = colorScheme === 'dark' ? styles.subtitleDark : styles.subtitleLight;
+  const favoriteTextStyle = colorScheme === 'dark' ? styles.favoriteTextDark : styles.favoriteTextLight;
+  const removeButtonStyle = colorScheme === 'dark' ? styles.removeButtonDark : styles.removeButtonLight;
+
   return (
-    <View style={styles.container}>
+    <View style={containerStyle}>
       <Text style={styles.title}>Clima Atual</Text>
 
       <TextInput
-        style={styles.input}
+        style={inputStyle}
         placeholder="Digite a cidade"
         value={city}
         onChangeText={setCity}
+        placeholderTextColor={colorScheme === 'dark' ? '#aaa' : '#888'}
       />
 
-      <RNView style={styles.buttonGroup}>
+      <RNView style={buttonGroupStyle}>
         <Button title="Buscar Clima" onPress={() => fetchCoordinates(city)} />
         <View style={{ width: 12 }} />
         <Button title="⭐ Salvar Favorito" onPress={saveFavorite} />
@@ -106,20 +117,20 @@ export default function TabOneScreen() {
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         weather && (
-          <Text style={styles.temp}>
+          <Text style={tempStyle}>
             {weather.icon} {weather.temp}°C - {weather.hour}
           </Text>
         )
       )}
 
-      <Text style={styles.subtitle}>Favoritos</Text>
+      <Text style={subtitleStyle}>Favoritos</Text>
       {favorites.map((fav, index) => (
         <RNView key={index} style={styles.favoriteItem}>
           <TouchableOpacity onPress={() => { setCity(fav); fetchCoordinates(fav); }}>
-            <Text style={styles.favoriteText}>{fav}</Text>
+            <Text style={favoriteTextStyle}>{fav}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => removeFavorite(fav)}>
-            <Text style={styles.removeButton}>❌</Text>
+            <Text style={removeButtonStyle}>❌</Text>
           </TouchableOpacity>
         </RNView>
       ))}
@@ -128,16 +139,23 @@ export default function TabOneScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  containerLight: {
     flex: 1,
     alignItems: 'center',
     paddingTop: 40,
+    backgroundColor: '#fff',
+  },
+  containerDark: {
+    flex: 1,
+    alignItems: 'center',
+    paddingTop: 40,
+    backgroundColor: '#121212',
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
   },
-  input: {
+  inputLight: {
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
@@ -145,17 +163,61 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginVertical: 15,
     width: '80%',
+    color: '#000',
+    backgroundColor: '#fff',
   },
-  temp: {
+  inputDark: {
+    height: 40,
+    borderColor: '#fff',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginVertical: 15,
+    width: '80%',
+    color: '#fff',
+    backgroundColor: '#333',
+  },
+  buttonGroupLight: {
+    flexDirection: 'row',
+    marginVertical: 10,
+    justifyContent: 'center',
+  },
+  buttonGroupDark: {
+    flexDirection: 'row',
+    marginVertical: 10,
+    justifyContent: 'center',
+  },
+  textLight: {
+    color: '#000',
+  },
+  textDark: {
+    color: '#fff',
+  },
+  tempLight: {
     fontSize: 28,
     fontWeight: 'bold',
     marginVertical: 10,
+    color: '#000',
   },
-  subtitle: {
+  tempDark: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    color: '#fff',
+  },
+  subtitleLight: {
     fontSize: 18,
     marginTop: 20,
     marginBottom: 8,
     fontWeight: '600',
+    color: '#000',
+  },
+  subtitleDark: {
+    fontSize: 18,
+    marginTop: 20,
+    marginBottom: 8,
+    fontWeight: '600',
+    color: '#fff',
   },
   favoriteItem: {
     flexDirection: 'row',
@@ -163,16 +225,22 @@ const styles = StyleSheet.create({
     width: '80%',
     paddingVertical: 5,
   },
-  favoriteText: {
+  favoriteTextLight: {
     fontSize: 16,
+    color: '#000',
   },
-  removeButton: {
+  favoriteTextDark: {
+    fontSize: 16,
+    color: '#fff',
+  },
+  removeButtonLight: {
     fontSize: 18,
     marginLeft: 10,
+    color: '#ff0000',
   },
-  buttonGroup: {
-    flexDirection: 'row',
-    marginVertical: 10,
-    justifyContent: 'center',
+  removeButtonDark: {
+    fontSize: 18,
+    marginLeft: 10,
+    color: '#ff6347',
   },
 });
